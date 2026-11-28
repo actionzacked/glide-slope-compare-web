@@ -1,36 +1,186 @@
 /* The app has one light appearance until the appearance setting arrives. */
 :root {
   color-scheme: light;
-  background: #ffffff;
+  --background: #ffffff;
+  --ink: #111827;
+  --muted: #4b5563;
+  --line: rgb(17 24 39 / 14%);
+  --surface: #f5f7fa;
+  --accent: #ff00ff;
+  --accent-ink: #ffffff;
+  background: var(--background);
+}
+
+html,
+body,
+#root {
+  height: 100%;
 }
 
 body {
   margin: 0;
+  overflow: hidden;
   font-family: system-ui, sans-serif;
-  color: #111827;
+  color: var(--ink);
+}
+
+button {
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* A thin ink edge around the accent ring keeps focus visible when the accent matches the background. */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 2px var(--background),
+    0 0 0 7px var(--ink);
+}
+
+/* ADR 0011: panels dock beside the profile, so it is never covered. */
+.app {
+  display: grid;
+  height: 100%;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "profile panel"
+    "playback panel";
+}
+
+.app:not(:has(.panel)) {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "profile"
+    "playback";
 }
 
 .profile {
+  grid-area: profile;
   position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* One row for the title and toolbar, so on a narrow phone the title shortens instead of running under the toolbar. */
+.profile-header {
+  position: absolute;
+  top: 12px;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 0 16px;
 }
 
 .title {
-  position: absolute;
-  top: 16px;
-  left: 16px;
+  flex: 1;
   margin: 0;
+  overflow: hidden;
   font-size: 1.25rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .profile-canvas {
   display: block;
   width: 100%;
-  height: 60vh;
-  min-height: 320px;
+  height: 100%;
+}
+
+.toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--background);
+  transition: transform 200ms ease;
+}
+
+.toolbar[data-collapsed="true"] {
+  transform: translateX(calc(100% + 12px));
+}
+
+.toolbar button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.toolbar button[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.toolbar-tab {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 54px;
+  border: 1px solid var(--line);
+  border-right: 0;
+  border-radius: 12px 0 0 12px;
+  background: var(--background);
+}
+
+.share-message {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 12px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--background);
+  font-size: 0.875rem;
+}
+
+.share-message:empty {
+  display: none;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* An empty strip until the playback controls arrive, at the height they will need. */
+.playback {
+  grid-area: playback;
+  min-height: 64px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
 }
 
 .panel {
+  grid-area: panel;
+  overflow: auto;
   padding: 16px;
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.panel .phone-only {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--background);
 }
 
 .aircraft-card h2 {
@@ -51,6 +201,58 @@ body {
 }
 
 .note {
-  color: #4b5563;
+  color: var(--muted);
   font-size: 0.875rem;
+}
+
+/* The screen-class rules come last so they override the rules above. */
+
+/* A phone held sideways is short but wide, so the panel stays beside the profile in a narrower column. */
+@media (max-height: 499px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+}
+
+/* A tablet or phone held upright is too narrow for a side column, so the panel goes below playback. */
+@media (max-width: 1099px) and (min-height: 500px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 50% auto minmax(0, 1fr);
+    grid-template-areas:
+      "profile"
+      "playback"
+      "panel";
+  }
+
+  .app:not(:has(.panel)) {
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .panel {
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+}
+
+/* A phone held upright fits only four toolbar buttons beside the title, so Share moves into Settings and Full screen is left out. */
+@media (max-width: 599px) and (min-height: 500px) {
+  .app {
+    grid-template-rows: 42% auto minmax(0, 1fr);
+  }
+
+  .toolbar .wide-only {
+    display: none;
+  }
+
+  .panel .phone-only {
+    display: inline-flex;
+  }
+}
+
+/* ADR 0006: animations stay off when the device asks for reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .toolbar {
+    transition: none;
+  }
 }
