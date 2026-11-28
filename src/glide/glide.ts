@@ -4,7 +4,7 @@ import { convertSpeed } from "./units";
 
 // Flat terrain at 0 ft MSL, so the starting altitude is the altitude above the terrain.
 export function glideDistanceFt(startAltitudeFt: number, glideRatio: number) {
-  if (!(glideRatio > 0)) return null;
+  if (!(startAltitudeFt >= 0 && glideRatio > 0)) return null;
   // AFH p. 3-21: glide distance = altitude above the terrain × glide ratio.
   return startAltitudeFt * glideRatio;
 }
@@ -37,6 +37,7 @@ export function glide({
     glideDistanceFt: distanceFt,
     glideTimeS:
       distanceFt === null ? null : glideTimeS(distanceFt, bestGlideSpeedKt),
-    sinkRateFpm: sinkRateFpm(bestGlideSpeedKt, glideRatio),
+    sinkRateFpm:
+      distanceFt === null ? null : sinkRateFpm(bestGlideSpeedKt, glideRatio),
   };
 }

@@ -25,6 +25,11 @@ describe("glide distance over flat terrain at 0 ft", () => {
     expectDistanceFt(glideDistanceFt(7500, 8.5), 63_750);
   });
 
+  test("glides 0 ft from 0 ft, already on the ground", () => {
+    // 0 × 9 = 0 ft
+    expectDistanceFt(glideDistanceFt(0, 9), 0);
+  });
+
   test("gives no result for a glide ratio of 0", () => {
     expect(glideDistanceFt(3000, 0)).toBeNull();
   });
@@ -84,6 +89,10 @@ describe("sink rate", () => {
   test("sinks 212.66 fpm, the GFH's 2.1 kt, at 50 kt and 50 ÷ 2.1", () => {
     // S5: the GFH example backwards; 50 ÷ (50 ÷ 2.1) = 2.1 kt; × 101.268591 = 212.66 fpm
     expectSinkRateFpm(sinkRateFpm(50, 50 / 2.1), 212.66);
+  });
+
+  test("gives no result for a glide ratio of 0", () => {
+    expect(sinkRateFpm(65, 0)).toBeNull();
   });
 });
 
@@ -220,5 +229,31 @@ describe("no result for a whole glide from 3,000 ft over flat terrain", () => {
       bestGlideSpeedKt: Number.NaN,
     });
     expect(result).toMatchObject({ glideTimeS: null, sinkRateFpm: null });
+  });
+
+  test("gives no result at all for a starting altitude below 0 ft", () => {
+    const result = glide({
+      startAltitudeFt: -100,
+      glideRatio: 9,
+      bestGlideSpeedKt: 65,
+    });
+    expect(result).toEqual({
+      glideDistanceFt: null,
+      glideTimeS: null,
+      sinkRateFpm: null,
+    });
+  });
+
+  test("gives no result at all for a starting altitude that is not a number", () => {
+    const result = glide({
+      startAltitudeFt: Number.NaN,
+      glideRatio: 9,
+      bestGlideSpeedKt: 65,
+    });
+    expect(result).toEqual({
+      glideDistanceFt: null,
+      glideTimeS: null,
+      sinkRateFpm: null,
+    });
   });
 });
