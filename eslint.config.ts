@@ -30,7 +30,7 @@ export default defineConfig(
     extends: [reactHooks.configs.flat.recommended, jsxA11y.flatConfigs.strict],
     languageOptions: { globals: globals.browser },
     rules: {
-      // The profile is a canvas labelled as one image (ADR 0005); jsx-a11y's recommended preset allows this, its strict one does not.
+      // The profile canvas is one labelled image (ADR 0005), which jsx-a11y's recommended preset allows.
       "jsx-a11y/no-interactive-element-to-noninteractive-role": [
         "error",
         { canvas: ["img"] },

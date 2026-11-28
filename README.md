@@ -13,7 +13,7 @@ npm ci
 npm run dev
 ```
 
-CI runs `format:check`, `lint`, `typecheck`, `knip`, `test`, `build` and `test:smoke` (after `npx playwright install chromium`).
+Run `npm run build` before `npm run test:smoke`, which tests the built site. The full list of checks is in `.github/workflows/checks.yml`.
 
 ## Contributing
 
