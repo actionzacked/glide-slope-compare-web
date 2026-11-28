@@ -88,15 +88,18 @@ export function Toolbar({
         >
           <Icon name="share" />
         </button>
-        <button
-          type="button"
-          className="wide-only"
-          aria-label="Full screen"
-          aria-pressed={fullScreen}
-          onClick={toggleFullScreen}
-        >
-          <Icon name="fullScreen" />
-        </button>
+        {/* iPhone Safari cannot make a web page full screen, so the button only shows where it works. */}
+        {document.fullscreenEnabled ? (
+          <button
+            type="button"
+            className="wide-only"
+            aria-label="Full screen"
+            aria-pressed={fullScreen}
+            onClick={toggleFullScreen}
+          >
+            <Icon name="fullScreen" />
+          </button>
+        ) : null}
       </div>
       {collapsed ? (
         <button

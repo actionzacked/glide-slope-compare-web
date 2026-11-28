@@ -6,6 +6,7 @@ async function boxOf(locator: Locator) {
   return box;
 }
 
+// Code run in the page is passed as strings, because these tests run in Node, whose types have no DOM.
 // The four screen classes of ADR 0011, at common device sizes.
 const desktop = { width: 1440, height: 900 };
 const phoneLandscape = { width: 844, height: 390 };
@@ -31,7 +32,7 @@ test.describe("on desktop", () => {
       `);
   });
 
-  test("without a share sheet, Share copies the site link and says so", async ({
+  test("without a share sheet, Share copies the site link", async ({
     page,
     context,
     baseURL,
@@ -41,17 +42,31 @@ test.describe("on desktop", () => {
 
     await page.getByRole("button", { name: "Share" }).click();
 
-    await expect(page.getByRole("status")).toHaveText("Link copied");
-    // A string expression, because the test runs in Node, whose types have no browser clipboard.
-    const copiedText = await page.evaluate<string>(
-      "navigator.clipboard.readText()",
-    );
-    expect(copiedText).toBe(`${String(baseURL)}/`);
+    await expect
+      .poll(() => page.evaluate<string>("navigator.clipboard.readText()"))
+      .toBe(`${String(baseURL)}/`);
   });
 
-  test("pressing Full screen enters full screen and lights its icon", async ({
-    page,
-  }) => {
+  test("after copying the link, Share says so", async ({ page, context }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.goto("/");
+
+    await page.getByRole("button", { name: "Share" }).click();
+
+    await expect(page.getByRole("status")).toHaveText("Link copied");
+  });
+
+  test("pressing Full screen fills the screen", async ({ page }) => {
+    await page.goto("/");
+
+    await page.getByRole("button", { name: "Full screen" }).click();
+
+    await expect
+      .poll(() => page.evaluate<boolean>("document.fullscreenElement !== null"))
+      .toBe(true);
+  });
+
+  test("in full screen, the Full screen icon is lit", async ({ page }) => {
     await page.goto("/");
 
     await page.getByRole("button", { name: "Full screen" }).click();
@@ -140,13 +155,26 @@ test.describe("on desktop", () => {
     await expect(page.getByRole("group", { name: "Toolbar" })).toBeVisible();
   });
 
-  test("the keyboard hides and restores the toolbar, with focus on the control that appears", async ({
+  test("hiding the toolbar by keyboard moves focus to the toolbar tab", async ({
     page,
   }) => {
     await page.goto("/");
 
     await page.keyboard.press("Tab");
     await page.keyboard.press("Enter");
+
+    await expect(
+      page.getByRole("button", { name: "Show toolbar" }),
+    ).toBeFocused();
+  });
+
+  test("restoring the toolbar by keyboard moves focus back to Hide toolbar", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Enter");
+
     await page.keyboard.press("Space");
 
     await expect(
@@ -265,5 +293,51 @@ test.describe("on phone portrait", () => {
         .getByRole("complementary", { name: "Settings" })
         .getByRole("button", { name: "Share" }),
     ).toBeVisible();
+  });
+});
+
+test.describe("on a small phone held upright", () => {
+  test.use({ viewport: { width: 320, height: 568 } });
+
+  test("the title stays clear of the toolbar", async ({ page }) => {
+    await page.goto("/");
+
+    const title = await boxOf(
+      page.getByRole("heading", { name: "Glide Compare" }),
+    );
+    const toolbar = await boxOf(page.getByRole("group", { name: "Toolbar" }));
+    expect(title.x + title.width).toBeLessThan(toolbar.x);
+  });
+});
+
+test.describe("in a browser that cannot go full screen", () => {
+  test.use({ viewport: phoneLandscape });
+
+  test("the toolbar leaves out Full screen", async ({ page }) => {
+    await page.addInitScript(
+      "Object.defineProperty(Document.prototype, 'fullscreenEnabled', { get: () => false })",
+    );
+    await page.goto("/");
+
+    await expect(page.getByRole("button", { name: "Share" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Full screen" })).toHaveCount(
+      0,
+    );
+  });
+});
+
+test.describe("on a short phone in landscape", () => {
+  test.use({ viewport: { width: 568, height: 320 } });
+
+  test("the open panel docks in a column to the right of the profile", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    const profile = await boxOf(
+      page.getByRole("img", { name: "Glide profile" }),
+    );
+    const panel = await boxOf(page.getByRole("complementary"));
+    expect(panel.x).toBe(profile.x + profile.width);
   });
 });

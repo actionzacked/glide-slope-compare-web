@@ -8,9 +8,9 @@ import { SettingsPanel } from "./SettingsPanel";
 import { shareSiteLink } from "./shareSiteLink";
 import { Toolbar, type Panel } from "./Toolbar";
 
+const shareMessageDurationMs = 2000;
 const exampleResult = glide(exampleAircraft);
 // The profile needs a glide distance to scale to, so it is left out when there is no result.
-const shareMessageDurationMs = 2000;
 const profileGlides: [Glide] | null =
   exampleResult.glideDistanceFt === null
     ? null
@@ -38,29 +38,36 @@ export function App() {
   }, [shareMessage]);
 
   function share() {
-    void shareSiteLink().then((result) => {
-      if (result === "copied") setShareMessage("Link copied");
-    });
+    shareSiteLink().then(
+      (result) => {
+        if (result === "copied") setShareMessage("Link copied");
+      },
+      () => {
+        setShareMessage("The link could not be shared");
+      },
+    );
   }
 
   return (
     <main className="app">
       <div className="profile">
-        <h1 className="title">Glide Compare</h1>
-        <Toolbar
-          openPanel={openPanel}
-          onTogglePanel={(panel) => {
-            setOpenPanel(openPanel === panel ? null : panel);
-          }}
-          playbackShown={playbackShown}
-          onTogglePlayback={() => {
-            setPlaybackShown(!playbackShown);
-          }}
-          onShare={share}
-        />
-        <p className="share-message" role="status">
-          {shareMessage}
-        </p>
+        <div className="profile-header">
+          <h1 className="title">Glide Compare</h1>
+          <Toolbar
+            openPanel={openPanel}
+            onTogglePanel={(panel) => {
+              setOpenPanel(openPanel === panel ? null : panel);
+            }}
+            playbackShown={playbackShown}
+            onTogglePlayback={() => {
+              setPlaybackShown(!playbackShown);
+            }}
+            onShare={share}
+          />
+          <p className="share-message" role="status">
+            {shareMessage}
+          </p>
+        </div>
         {profileGlides === null ? null : (
           <ProfileCanvas glides={profileGlides} />
         )}

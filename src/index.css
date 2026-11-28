@@ -24,6 +24,13 @@ body {
   color: var(--ink);
 }
 
+button {
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
 /* A thin ink edge around the accent ring keeps focus visible when the accent matches the background. */
 :focus-visible {
   outline: 3px solid var(--accent);
@@ -58,12 +65,25 @@ body {
   overflow: hidden;
 }
 
-.title {
+/* One row for the title and toolbar, so on a narrow phone the title shortens instead of running under the toolbar. */
+.profile-header {
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: 12px;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 0 16px;
+}
+
+.title {
+  flex: 1;
   margin: 0;
+  overflow: hidden;
   font-size: 1.25rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .profile-canvas {
@@ -73,9 +93,6 @@ body {
 }
 
 .toolbar {
-  position: absolute;
-  top: 12px;
-  right: 12px;
   display: flex;
   gap: 4px;
   padding: 4px;
@@ -94,12 +111,9 @@ body {
   place-items: center;
   width: 44px;
   height: 44px;
-  padding: 0;
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: inherit;
-  cursor: pointer;
 }
 
 .toolbar button[aria-pressed="true"] {
@@ -109,24 +123,21 @@ body {
 
 .toolbar-tab {
   position: absolute;
-  top: 12px;
+  top: 0;
   right: 0;
   display: grid;
   place-items: center;
   width: 32px;
   height: 54px;
-  padding: 0;
   border: 1px solid var(--line);
   border-right: 0;
   border-radius: 12px 0 0 12px;
   background: var(--background);
-  color: inherit;
-  cursor: pointer;
 }
 
 .share-message {
   position: absolute;
-  top: 78px;
+  top: calc(100% + 12px);
   right: 12px;
   margin: 0;
   padding: 8px 12px;
@@ -170,9 +181,6 @@ body {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--background);
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
 }
 
 .aircraft-card h2 {
@@ -197,16 +205,16 @@ body {
   font-size: 0.875rem;
 }
 
-/* Screen classes from ADR 0011. They come last so they override the rules above. */
+/* The screen-class rules come last so they override the rules above. */
 
-/* Phone landscape: a narrower right-hand column. */
-@media (max-height: 499px) and (min-width: 600px) {
+/* A phone held sideways is short but wide, so the panel stays beside the profile in a narrower column. */
+@media (max-height: 499px) {
   .app {
     grid-template-columns: minmax(0, 1fr) 320px;
   }
 }
 
-/* Tablet and phone portrait: profile on top, playback below it, then the panel. */
+/* A tablet or phone held upright is too narrow for a side column, so the panel goes below playback. */
 @media (max-width: 1099px) and (min-height: 500px) {
   .app {
     grid-template-columns: minmax(0, 1fr);
@@ -227,8 +235,8 @@ body {
   }
 }
 
-/* Phone portrait: the title and toolbar share one row, so Share moves into Settings and Full screen is left out. */
-@media (max-width: 599px) {
+/* A phone held upright fits only four toolbar buttons beside the title, so Share moves into Settings and Full screen is left out. */
+@media (max-width: 599px) and (min-height: 500px) {
   .app {
     grid-template-rows: 42% auto minmax(0, 1fr);
   }
