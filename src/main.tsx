@@ -14,3 +14,4 @@ createRoot(rootElement).render(
     </main>
   </StrictMode>,
 );
+const unusedValue = 1;
