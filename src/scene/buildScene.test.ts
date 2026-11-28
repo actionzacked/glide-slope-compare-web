@@ -1,9 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { buildScene } from "./buildScene";
 
-// The profile leaves 64 px on the left for altitude labels, 16 px on the right,
-// 64 px at the top for the title and toolbar, and 32 px below the ground.
-// A 1,080 px wide canvas therefore has a 1,000 px wide plot.
+// Margins of 64 px left, 16 px right, 64 px top and 32 px bottom give a 1,080 px canvas a 1,000 px wide plot.
 
 const exampleGlide = {
   name: "Example 9:1",
@@ -13,8 +11,7 @@ const exampleGlide = {
 
 describe("scene for one glide on flat terrain", () => {
   test("starts the glide at its starting altitude on the left edge of the plot", () => {
-    // Tall enough for 6×: 1,000 px plot ÷ (27,000 × 1.05 ft) = 0.035273 px/ft across, × 6 = 0.211640 px/ft up.
-    // The ground is at 1,000 − 32 = 968 px, so 3,000 ft is 968 − 3,000 × 0.211640 = 333.08 px.
+    // 1,000 px ÷ (27,000 × 1.05 ft) = 0.035273 px/ft across, × 6 = 0.211640 px/ft up; 968 − 3,000 × 0.211640 = 333.08 px.
     const scene = buildScene({
       widthPx: 1080,
       heightPx: 1000,
@@ -31,8 +28,8 @@ describe("scene for one glide on flat terrain", () => {
       heightPx: 1000,
       glides: [exampleGlide],
     });
-    expect(scene.glides[0]?.endPx.x).toBeCloseTo(1016.38, 2);
-    expect(scene.glides[0]?.endPx.y).toBeCloseTo(968, 2);
+    expect(scene.glides[0]?.terrainContactPx.x).toBeCloseTo(1016.38, 2);
+    expect(scene.glides[0]?.terrainContactPx.y).toBeCloseTo(968, 2);
   });
 
   test("draws the ground 32 px above the bottom of the profile", () => {
@@ -73,8 +70,8 @@ describe("scene for one glide on flat terrain", () => {
     expect(scene.glides[0]?.startPx.y).toBeCloseTo(64, 2);
   });
 
-  test("names the glide on the ground just below its touchdown point, clear of the line", () => {
-    // The name's right end sits at the touchdown, 1,016.38 px, 8 px below the 968 px ground.
+  test("names the glide on the ground just below its terrain contact, clear of the line", () => {
+    // The name's right end sits at the terrain contact, 1,016.38 px, 8 px below the 968 px ground.
     const scene = buildScene({
       widthPx: 1080,
       heightPx: 1000,

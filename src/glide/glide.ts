@@ -21,7 +21,7 @@ export function sinkRateFpm(bestGlideSpeedKt: number, glideRatio: number) {
   return convertSpeed(bestGlideSpeedKt / glideRatio, "kt", "fpm");
 }
 
-interface GlideInputs {
+export interface GlideInputs {
   startAltitudeFt: number;
   glideRatio: number;
   bestGlideSpeedKt: number;

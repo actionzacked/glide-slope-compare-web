@@ -17,13 +17,18 @@ export interface Glide {
 interface SceneInput {
   widthPx: number;
   heightPx: number;
-  glides: Glide[];
+  // At least one glide, so the profile has a scale.
+  glides: [Glide, ...Glide[]];
 }
 
 export function buildScene({ widthPx, heightPx, glides }: SceneInput) {
   const groundYPx = heightPx - margin.bottomPx;
-  const longestGlideFt = Math.max(...glides.map((g) => g.glideDistanceFt));
-  const highestStartFt = Math.max(...glides.map((g) => g.startAltitudeFt));
+  const longestGlideFt = Math.max(
+    ...glides.map((glide) => glide.glideDistanceFt),
+  );
+  const highestStartFt = Math.max(
+    ...glides.map((glide) => glide.startAltitudeFt),
+  );
   const pxPerFtAcross =
     (widthPx - margin.leftPx - margin.rightPx) / (longestGlideFt * widthBuffer);
   const pxPerFtUp = Math.min(
@@ -62,12 +67,16 @@ export function buildScene({ widthPx, heightPx, glides }: SceneInput) {
         yPx: line.yPx,
       })),
     verticalExaggeration: pxPerFtUp / pxPerFtAcross,
-    glides: glides.map((g) => {
-      const endPx = toPx(g.glideDistanceFt, 0);
+    glides: glides.map((glide) => {
+      const terrainContactPx = toPx(glide.glideDistanceFt, 0);
       return {
-        startPx: toPx(0, g.startAltitudeFt),
-        endPx,
-        nameLabel: { text: g.name, xPx: endPx.x, yPx: endPx.y + labelGapPx },
+        startPx: toPx(0, glide.startAltitudeFt),
+        terrainContactPx,
+        nameLabel: {
+          text: glide.name,
+          xPx: terrainContactPx.x,
+          yPx: terrainContactPx.y + labelGapPx,
+        },
       };
     }),
   };

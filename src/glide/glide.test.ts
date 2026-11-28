@@ -1,32 +1,28 @@
 import { describe, expect, test } from "vitest";
 import { glide, glideDistanceFt, glideTimeS, sinkRateFpm } from "./glide";
-import { expectWithin } from "./tolerances";
-
-const distanceToleranceFt = 1;
-const timeToleranceS = 0.1;
-const sinkRateToleranceFpm = 1;
+import { expectDistanceFt, expectSinkRateFpm, expectTimeS } from "./tolerances";
 
 describe("glide distance over flat terrain at 0 ft", () => {
   // AFH p. 3-21: glide distance = altitude above the terrain × glide ratio.
 
   test("glides 10,000 ft from 1,000 ft at 10:1", () => {
     // D1: 1,000 × 10 = 10,000 ft
-    expectWithin(glideDistanceFt(1000, 10), 10_000, distanceToleranceFt);
+    expectDistanceFt(glideDistanceFt(1000, 10), 10_000);
   });
 
   test("glides 27,000 ft from 3,000 ft at 9:1", () => {
     // D2: 3,000 × 9 = 27,000 ft
-    expectWithin(glideDistanceFt(3000, 9), 27_000, distanceToleranceFt);
+    expectDistanceFt(glideDistanceFt(3000, 9), 27_000);
   });
 
   test("glides 48,000 ft from 2,000 ft at 24:1", () => {
     // D3: 2,000 × 24 = 48,000 ft
-    expectWithin(glideDistanceFt(2000, 24), 48_000, distanceToleranceFt);
+    expectDistanceFt(glideDistanceFt(2000, 24), 48_000);
   });
 
   test("glides 63,750 ft from 7,500 ft at 8.5:1", () => {
     // D4: 7,500 × 8.5 = 63,750 ft
-    expectWithin(glideDistanceFt(7500, 8.5), 63_750, distanceToleranceFt);
+    expectDistanceFt(glideDistanceFt(7500, 8.5), 63_750);
   });
 
   test("gives no result for a glide ratio of 0", () => {
@@ -39,22 +35,22 @@ describe("glide time", () => {
 
   test("glides for 91.15 s over 10,000 ft at 65 kt", () => {
     // T1: 65 × 1.687810 = 109.7076 ft/s; 10,000 ÷ 109.7076 = 91.15 s
-    expectWithin(glideTimeS(10_000, 65), 91.15, timeToleranceS);
+    expectTimeS(glideTimeS(10_000, 65), 91.15);
   });
 
   test("glides for 246.11 s over 27,000 ft at 65 kt", () => {
     // T2: 27,000 ÷ 109.7076 = 246.11 s
-    expectWithin(glideTimeS(27_000, 65), 246.11, timeToleranceS);
+    expectTimeS(glideTimeS(27_000, 65), 246.11);
   });
 
   test("glides for 568.78 s over 48,000 ft at 50 kt", () => {
     // T3: 50 × 1.687810 = 84.3905 ft/s; 48,000 ÷ 84.3905 = 568.78 s
-    expectWithin(glideTimeS(48_000, 50), 568.78, timeToleranceS);
+    expectTimeS(glideTimeS(48_000, 50), 568.78);
   });
 
   test("glides for 539.58 s over 63,750 ft at 70 kt", () => {
     // T4: 70 × 1.687810 = 118.1467 ft/s; 63,750 ÷ 118.1467 = 539.58 s
-    expectWithin(glideTimeS(63_750, 70), 539.58, timeToleranceS);
+    expectTimeS(glideTimeS(63_750, 70), 539.58);
   });
 
   test("gives no result for a best-glide speed of 0 kt", () => {
@@ -67,27 +63,27 @@ describe("sink rate", () => {
 
   test("sinks 658.25 fpm at 65 kt and 10:1", () => {
     // S1: 65 ÷ 10 = 6.5 kt; × 101.268591 = 658.25 fpm
-    expectWithin(sinkRateFpm(65, 10), 658.25, sinkRateToleranceFpm);
+    expectSinkRateFpm(sinkRateFpm(65, 10), 658.25);
   });
 
   test("sinks 731.38 fpm at 65 kt and 9:1", () => {
     // S2: 65 ÷ 9 = 7.2222 kt; × 101.268591 = 731.38 fpm
-    expectWithin(sinkRateFpm(65, 9), 731.38, sinkRateToleranceFpm);
+    expectSinkRateFpm(sinkRateFpm(65, 9), 731.38);
   });
 
   test("sinks 210.98 fpm at 50 kt and 24:1", () => {
     // S3: 50 ÷ 24 = 2.0833 kt; × 101.268591 = 210.98 fpm
-    expectWithin(sinkRateFpm(50, 24), 210.98, sinkRateToleranceFpm);
+    expectSinkRateFpm(sinkRateFpm(50, 24), 210.98);
   });
 
   test("sinks 833.98 fpm at 70 kt and 8.5:1", () => {
     // S4: 70 ÷ 8.5 = 8.2353 kt; × 101.268591 = 833.98 fpm
-    expectWithin(sinkRateFpm(70, 8.5), 833.98, sinkRateToleranceFpm);
+    expectSinkRateFpm(sinkRateFpm(70, 8.5), 833.98);
   });
 
   test("sinks 212.66 fpm, the GFH's 2.1 kt, at 50 kt and 50 ÷ 2.1", () => {
     // S5: the GFH example backwards; 50 ÷ (50 ÷ 2.1) = 2.1 kt; × 101.268591 = 212.66 fpm
-    expectWithin(sinkRateFpm(50, 50 / 2.1), 212.66, sinkRateToleranceFpm);
+    expectSinkRateFpm(sinkRateFpm(50, 50 / 2.1), 212.66);
   });
 });
 
@@ -99,9 +95,9 @@ describe("a whole glide over flat terrain at 0 ft", () => {
       glideRatio: 9,
       bestGlideSpeedKt: 65,
     });
-    expectWithin(result.glideDistanceFt, 27_000, distanceToleranceFt);
-    expectWithin(result.glideTimeS, 246.11, timeToleranceS);
-    expectWithin(result.sinkRateFpm, 731.38, sinkRateToleranceFpm);
+    expectDistanceFt(result.glideDistanceFt, 27_000);
+    expectTimeS(result.glideTimeS, 246.11);
+    expectSinkRateFpm(result.sinkRateFpm, 731.38);
   });
 
   test("from 2,000 ft at 24:1 and 50 kt glides 48,000 ft in 568.78 s, sinking 210.98 fpm", () => {
@@ -111,9 +107,9 @@ describe("a whole glide over flat terrain at 0 ft", () => {
       glideRatio: 24,
       bestGlideSpeedKt: 50,
     });
-    expectWithin(result.glideDistanceFt, 48_000, distanceToleranceFt);
-    expectWithin(result.glideTimeS, 568.78, timeToleranceS);
-    expectWithin(result.sinkRateFpm, 210.98, sinkRateToleranceFpm);
+    expectDistanceFt(result.glideDistanceFt, 48_000);
+    expectTimeS(result.glideTimeS, 568.78);
+    expectSinkRateFpm(result.sinkRateFpm, 210.98);
   });
 
   test("from 7,500 ft at 8.5:1 and 70 kt glides 63,750 ft in 539.58 s, sinking 833.98 fpm", () => {
@@ -123,9 +119,9 @@ describe("a whole glide over flat terrain at 0 ft", () => {
       glideRatio: 8.5,
       bestGlideSpeedKt: 70,
     });
-    expectWithin(result.glideDistanceFt, 63_750, distanceToleranceFt);
-    expectWithin(result.glideTimeS, 539.58, timeToleranceS);
-    expectWithin(result.sinkRateFpm, 833.98, sinkRateToleranceFpm);
+    expectDistanceFt(result.glideDistanceFt, 63_750);
+    expectTimeS(result.glideTimeS, 539.58);
+    expectSinkRateFpm(result.sinkRateFpm, 833.98);
   });
 
   test("answers the FAA glider test: 2,113.43 ft at 23:1 glides 8 NM", () => {
@@ -135,7 +131,7 @@ describe("a whole glide over flat terrain at 0 ft", () => {
       glideRatio: 23,
       bestGlideSpeedKt: 50,
     });
-    expectWithin(result.glideDistanceFt, 48_608.89, distanceToleranceFt);
+    expectDistanceFt(result.glideDistanceFt, 48_608.89);
   });
 });
 

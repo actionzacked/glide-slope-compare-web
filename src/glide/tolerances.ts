@@ -1,8 +1,11 @@
 import { expect } from "vitest";
 
-// Tolerances for glide-math worked examples, as the coding standards set them.
+// One place for the tolerances the coding standards set on worked examples.
+const distanceToleranceFt = 1;
+const timeToleranceS = 0.1;
+const sinkRateToleranceFpm = 1;
 
-export function expectWithin(
+function expectWithin(
   actual: number | null,
   expected: number,
   tolerance: number,
@@ -11,6 +14,18 @@ export function expectWithin(
   expect(Math.abs((actual ?? Number.NaN) - expected)).toBeLessThanOrEqual(
     tolerance,
   );
+}
+
+export function expectDistanceFt(actual: number | null, expectedFt: number) {
+  expectWithin(actual, expectedFt, distanceToleranceFt);
+}
+
+export function expectTimeS(actual: number | null, expectedS: number) {
+  expectWithin(actual, expectedS, timeToleranceS);
+}
+
+export function expectSinkRateFpm(actual: number | null, expectedFpm: number) {
+  expectWithin(actual, expectedFpm, sinkRateToleranceFpm);
 }
 
 export function expectSameTo4SignificantFigures(

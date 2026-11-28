@@ -3,7 +3,7 @@ import { buildScene, type Glide } from "../scene/buildScene";
 import { drawScene } from "../scene/drawScene";
 
 interface ProfileCanvasProps {
-  glides: Glide[];
+  glides: [Glide, ...Glide[]];
 }
 
 export function ProfileCanvas({ glides }: ProfileCanvasProps) {

@@ -1,12 +1,14 @@
-import { exampleAircraft } from "../exampleAircraft";
+import type { Glide } from "../scene/buildScene";
 import { glide } from "../glide/glide";
 import { AircraftCard } from "./AircraftCard";
+import { exampleAircraft } from "./exampleAircraft";
 import { ProfileCanvas } from "./ProfileCanvas";
 
 const exampleResult = glide(exampleAircraft);
-const profileGlides =
+// The profile needs a glide distance to scale to, so it is left out when there is no result.
+const profileGlides: [Glide] | null =
   exampleResult.glideDistanceFt === null
-    ? []
+    ? null
     : [
         {
           name: exampleAircraft.name,
@@ -20,7 +22,9 @@ export function App() {
     <main>
       <div className="profile">
         <h1 className="title">Glide Compare</h1>
-        <ProfileCanvas glides={profileGlides} />
+        {profileGlides === null ? null : (
+          <ProfileCanvas glides={profileGlides} />
+        )}
       </div>
       <aside className="panel" aria-label="Aircraft">
         <AircraftCard name={exampleAircraft.name} {...exampleResult} />

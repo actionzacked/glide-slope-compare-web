@@ -9,6 +9,7 @@ const colours = {
   text: "#111827",
 };
 const font = "13px system-ui, sans-serif";
+const lineWidthsPx = { gridLine: 1, groundLine: 1.5, glide: 3 };
 
 interface PictureSize {
   widthPx: number;
@@ -24,7 +25,7 @@ export function drawScene(
   context.fillRect(0, 0, widthPx, heightPx);
 
   context.strokeStyle = colours.gridLine;
-  context.lineWidth = 1;
+  context.lineWidth = lineWidthsPx.gridLine;
   for (const line of scene.altitudeGridLines) {
     context.beginPath();
     context.moveTo(scene.plotLeftPx, line.yPx);
@@ -35,7 +36,7 @@ export function drawScene(
   context.fillStyle = colours.ground;
   context.fillRect(0, scene.groundYPx, widthPx, heightPx - scene.groundYPx);
   context.strokeStyle = colours.groundLine;
-  context.lineWidth = 1.5;
+  context.lineWidth = lineWidthsPx.groundLine;
   context.beginPath();
   context.moveTo(0, scene.groundYPx);
   context.lineTo(widthPx, scene.groundYPx);
@@ -50,12 +51,12 @@ export function drawScene(
   }
 
   context.strokeStyle = colours.glide;
-  context.lineWidth = 3;
+  context.lineWidth = lineWidthsPx.glide;
   context.textBaseline = "top";
   for (const glide of scene.glides) {
     context.beginPath();
     context.moveTo(glide.startPx.x, glide.startPx.y);
-    context.lineTo(glide.endPx.x, glide.endPx.y);
+    context.lineTo(glide.terrainContactPx.x, glide.terrainContactPx.y);
     context.stroke();
     context.fillText(
       glide.nameLabel.text,

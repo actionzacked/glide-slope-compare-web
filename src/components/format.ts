@@ -1,4 +1,4 @@
-import { convertDistance } from "../glide/units";
+import { convertDistance, secondsPerMinute } from "../glide/units";
 
 const noResult = "—";
 
@@ -16,7 +16,7 @@ export function formatGlideDistance(glideDistanceFt: number | null) {
 export function formatGlideTime(glideTimeS: number | null) {
   return orDash(glideTimeS, (timeS) => {
     const wholeSeconds = Math.round(timeS);
-    return `${String(Math.floor(wholeSeconds / 60))} min ${String(wholeSeconds % 60)} s`;
+    return `${String(Math.floor(wholeSeconds / secondsPerMinute))} min ${String(wholeSeconds % secondsPerMinute)} s`;
   });
 }
 
