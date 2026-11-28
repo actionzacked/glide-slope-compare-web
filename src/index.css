@@ -1,0 +1,56 @@
+/* The app has one light appearance until the appearance setting arrives. */
+:root {
+  color-scheme: light;
+  background: #ffffff;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  color: #111827;
+}
+
+.profile {
+  position: relative;
+}
+
+.title {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.profile-canvas {
+  display: block;
+  width: 100%;
+  height: 60vh;
+  min-height: 320px;
+}
+
+.panel {
+  padding: 16px;
+}
+
+.aircraft-card h2 {
+  margin: 0 0 8px;
+  font-size: 1.125rem;
+}
+
+.aircraft-card dl {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  gap: 4px 16px;
+  margin: 0;
+}
+
+.aircraft-card dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.note {
+  color: #4b5563;
+  font-size: 0.875rem;
+}
