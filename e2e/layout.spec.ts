@@ -1,4 +1,10 @@
-import { expect, test, type Locator } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
+
+// Keyboard tests wait for React to draw the toolbar, because page.goto returns before it does.
+async function openWithToolbarDrawn(page: Page) {
+  await page.goto("/");
+  await expect(page.getByRole("group", { name: "Toolbar" })).toBeVisible();
+}
 
 async function boxOf(locator: Locator) {
   const box = await locator.boundingBox();
@@ -158,7 +164,7 @@ test.describe("on desktop", () => {
   test("hiding the toolbar by keyboard moves focus to the toolbar tab", async ({
     page,
   }) => {
-    await page.goto("/");
+    await openWithToolbarDrawn(page);
 
     await page.keyboard.press("Tab");
     await page.keyboard.press("Enter");
@@ -171,9 +177,12 @@ test.describe("on desktop", () => {
   test("restoring the toolbar by keyboard moves focus back to Hide toolbar", async ({
     page,
   }) => {
-    await page.goto("/");
+    await openWithToolbarDrawn(page);
     await page.keyboard.press("Tab");
     await page.keyboard.press("Enter");
+    await expect(
+      page.getByRole("button", { name: "Show toolbar" }),
+    ).toBeFocused();
 
     await page.keyboard.press("Space");
 
@@ -185,7 +194,7 @@ test.describe("on desktop", () => {
   test("a keyboard-focused toolbar button shows an outline in the accent colour", async ({
     page,
   }) => {
-    await page.goto("/");
+    await openWithToolbarDrawn(page);
 
     await page.keyboard.press("Tab");
 
